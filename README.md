@@ -1,2 +1,2 @@
 # Marvin
-My first discord bot
+Marvin is a sad robot.
