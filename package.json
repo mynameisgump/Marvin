@@ -1,0 +1,12 @@
+{
+    "name": "Marvin",
+    "version": "1.0.0",
+    "description": "My first bot",
+    "main": "bot.js",
+    "author": "Ethan Crann",
+    "dependencies": {
+        "discord.io": "github:woor/discord.io#gateway_v6",
+        "discord.js": "^11.5.1",
+        "winston": "^3.2.1"
+    }
+}
