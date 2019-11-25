@@ -2,6 +2,10 @@ var Discord = require('discord.io');
 var logger = require('winston');
 var auth = require('./auth.json');
 
+//Requirements for weather
+const DarkSky = require('dark-sky')
+const { darkSkyKey } = require('./auth.json');
+
 //Requirements for google sheets
 const fs = require('fs');
 const readline = require('readline');
@@ -35,7 +39,7 @@ bot.on('ready', function (evt) {
 
 //Reactions to messages
 bot.on('message', function (user, userID, channelID, message, evt) {
-    if (message.substring(0, 1) == '!') {
+    if (message.substring(0, 5) == 'Marvin') {
         var args = message.substring(1).split(' ');
         var cmd = args[0];
        
@@ -53,14 +57,14 @@ bot.on('message', function (user, userID, channelID, message, evt) {
      }
 
     //
-    if(message == 'What is the answer to life, the universe, and everything?'){
+    if(message == 'Marvin What is the answer to life, the universe, and everything?'){
         bot.sendMessage({
             to:channelID,
                 message: '42'
             });
         ; 
     }
-    if(message.substring(0,10) == 'babblefish') {
+    if(message.substring(0,10) == 'Marvin babblefish') {
     //Potentially some for of translation?
         bot.sendMessage({
             to:channelID,
@@ -69,7 +73,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     ; 
     }
 
-    if(message.substring(0,10) == '!sheets'){
+    if(message.substring(0,10) == 'Marvin sheets'){
         //Implments a function to read mixer stats from a google sheet
 
         //Authorize function for sheets
@@ -116,33 +120,32 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
 
 
-        /**
-         * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
-         */
+        
+        //@param {google.auth.OAuth2} auth The authenticated Google OAuth client.
         async function listMixerStats(auth) {
-        const sheets = google.sheets({version: 'v4', auth});
-        await sheets.spreadsheets.values.get({
-            spreadsheetId: '1yObdyGAsbbpAc8GFut0TSJ-1Tg4ghGt2snCs6i0zK_w',
-            range: 'Stats Sheet!A:A',
-            }, 
-            async (err, res) => {
-                //if (err) return console.log('The API returned an error: ' + err);
-                try{
-                const rows = res.data.values;
-                lastMix = rows[0][0]+" "+rows[1][0];
-                totalCash = rows[3][0]+" "+rows[4][0];
-                cashLast = rows[6][0]+" "+rows[7][0];
-                let outString = lastMix+"\n"+totalCash+"\n"+cashLast;
-                console.log(outString);
-                bot.sendMessage({
-                    to:channelID,
-                        message: outString
+            const sheets = google.sheets({version: 'v4', auth});
+            await sheets.spreadsheets.values.get({
+                spreadsheetId: '1yObdyGAsbbpAc8GFut0TSJ-1Tg4ghGt2snCs6i0zK_w',
+                range: 'Stats Sheet!A:A',
+                }, 
+                (err, res) => {
+                    //if (err) return console.log('The API returned an error: ' + err);
+                    try{
+                    const rows = res.data.values;
+                    lastMix = rows[0][0]+" "+rows[1][0];
+                    totalCash = rows[3][0]+" "+rows[4][0];
+                    cashLast = rows[6][0]+" "+rows[7][0];
+                    let outString = lastMix+"\n"+totalCash+"\n"+cashLast;
+                    console.log(outString);
+                    bot.sendMessage({
+                        to:channelID,
+                            message: outString
+                    });
+                    }
+                    catch(err){
+                        return console.log('The API returned an error: ' + err);
+                    }
                 });
-                }
-                catch(err){
-                    return console.log('The API returned an error: ' + err);
-                }
-            });
         }
 
 
@@ -155,6 +158,29 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
 
   
+
+    }
+
+    //Dark Sky Weather Implementation
+    if(message.substring(0,15) == 'Marvin weather'){
+        let darksky = new DarkSky(darkSkyKey);
+        (async () => {
+            const weather = await darksky.latitude('47.5165').longitude('-52.7126').get().catch(console.log)
+            console.log(weather);
+
+            console.log(weather.timezone);
+            bot.sendMessage({
+                to:channelID,
+                    message: 'Brain the size of the planet and you ask me the weather?'+"\n"+
+                    "Weather Summary: "+weather.currently.summary+"\n"+
+                    "Temperature: "+weather.currently.apparentTemperature+"\n"+
+                    "Apparent Temperature: "+weather.currently.temperature+"\n"+
+                    "Precipitation Probability: "+weather.currently.precipProbability+"\n"+
+                    "Precipitation Amount: "+weather.currently.precipIntensity+"\n"+
+                    "Wind Speed: "+weather.currently.windSpeed+
+                    "Powered by Dark Sky -> https://darksky.net/poweredby/"
+            });
+        })();
 
     }
 });

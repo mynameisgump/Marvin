@@ -1,5 +1,8 @@
+docs/
 node_modules/
+
 credentials.json
 auth.js
 auth.json
 token.json
+darkskyKey.json
