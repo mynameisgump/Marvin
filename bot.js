@@ -13,8 +13,7 @@ const { google } = require('googleapis');
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 const TOKEN_PATH = 'token.json';
 
-
-
+const ncbi = require('node-ncbi');
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
@@ -40,10 +39,10 @@ bot.on('ready', function (evt) {
 //Reactions to messages
 bot.on('message', function (user, userID, channelID, message, evt) {
     if (message.substring(0, 6) == 'Marvin') {
+        
+
         let args = message.split(' ');
         let cmd = args[1];
-
-        args = args.splice(1);
 
         switch (cmd) {
             // !ping
@@ -53,7 +52,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     message: 'What\'s the point? Am I a joke to you?'
                 });
             break;
-            case 'babblefish':
+            case 'babelfish':
                 bot.sendMessage({
                     to: channelID,
                     message: 'The poor Babel fish by effectively removing all barriers to communication between different races and cultures, has caused more and bloodier wars than anything else in the history of creation'
@@ -149,8 +148,36 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     });
                 })();
             break;
-
+            case 'papers':
+                const pubmed = ncbi.pubmed;
+                if(args[2] == "search"){
+                    let searchString = args.splice(3).join(" ");
+                    pubmed.search(searchString).then((results) => {
+                        let outputString = "";
+                        if(results["papers"].length != 0){
+                            for (let step = 0; step < 10; step++) {
+                                outputString = outputString + 
+                                            results["papers"][step].title + "\n" +
+                                            "**Date:** "+results["papers"][step].pubDate + "\n" + 
+                                            "**DOI:** "+results["papers"][step].doi + 
+                                            "\n" + "\n";
+                            }
+                            bot.sendMessage({
+                                to: channelID,
+                                message: outputString
+                            });
+                        }
+                        else{
+                            bot.sendMessage({
+                                to: channelID,
+                                message: "No papers were found"
+                            });
+                        }
+                    });
+                }
+            break;
         }
+
     }
     if (message == 'Marvin what is the answer to life, the universe, and everything?') {
         bot.sendMessage({
@@ -158,6 +185,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             message: '42'
         });
     }
+
 
 
 

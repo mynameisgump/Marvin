@@ -9,6 +9,7 @@
         "discord.io": "github:woor/discord.io#gateway_v6",
         "discord.js": "^11.5.1",
         "googleapis": "^39.2.0",
+        "node-ncbi": "^0.7.0",
         "save": "^2.4.0",
         "winston": "^3.2.1",
         "ws": "^7.2.0"
