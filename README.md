@@ -1,2 +1,2 @@
 # Marvin
-Marvin is a sad robot.
+Marvin is my first discord bot, so I choose to implement many different features in order to practice utilizing various api's and tools. My favorite feature is the sheets functions, which allows me to generate information about sales from society events and return it back to the discord server. Marvin can also gather weather information about St.John's utilizing the Dark Sky API, and can also search NCBI for academic papers.
